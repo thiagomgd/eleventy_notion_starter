@@ -1,0 +1,26 @@
+---
+layout: layouts/home.njk
+eleventyNavigation:
+  key: Home
+  order: 1
+---
+
+<section class="header-masthead">
+  <div class="content-780 flow">
+    <h1>{{ metadata.title }}</h1>
+    <p>Welcome to my blog!</p>
+  </div>
+</section>
+
+
+<section class="content-780">
+  {% set maxPosts = collections.posts.length | min(3) %}
+  <h2>Latest {% if maxPosts == 1 %}Post{% else %}{{ maxPosts }} Posts{% endif %}</h2>
+
+  {% set postslist = collections.posts | head(-3) %}
+  {% set postslistCounter = collections.posts | length %}
+  {% include "postslist.njk" %}
+
+  <p>More posts can be found in <a href="{{ '/posts/' | url }}">the archive</a>.</p>
+
+</section>

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title or metadata.title }}</title>
+    <meta name="description" content="{{ description or metadata.description }}">
+
+    <!-- Inline and minify CSS - VS Code thinks this is invalid but it's fine -->
+    {% set code_css %}
+      {% include "_code.css" %}
+    {% endset %}
+    {% set css %}
+      {% include "style.css" %}
+    {% endset %}
+    <style>
+      {{ code_css | cssmin | safe }}
+      {{ css | cssmin | safe }}
+    </style>
+
+    <link rel="alternate" href="{{ metadata.feed.path | url }}" type="application/atom+xml" title="{{ metadata.title }}">
+    <link rel="alternate" href="{{ metadata.jsonfeed.path | url }}" type="application/json" title="{{ metadata.title }}">
+
+    {%- set absolutePostUrl %}{{ page.url | url | absoluteUrl(metadata.url) }}{% endset -%}
+    {% if thumbnail %}
+    {%- set thumbnailUrl %}{{ thumbnail | url | absoluteUrl(metadata.url) }}{% endset -%}
+    {% endif %}
+
+    {% metagen
+        title=title or metadata.title,
+        desc=description or lead or metadata.description,
+        url=absolutePostUrl,
+        img=thumbnailUrl,
+        twitter_card_type="summary_large_image",
+        twitter_handle="FalconSensei",
+        name="Falcon | Geekosaur",
+        generator="eleventy",
+        comments=true
+    %}
+
+  <link rel="webmention" href="https://webmention.io/geekosaur.com/webmention" />
+	<link rel="pingback" href="https://webmention.io/geekosaur.com/xmlrpc" />
+	<link href="https://twitter.com/FalconSensei" rel="me" />
+	<link rel="me" href="https://mastodon.social/@falcon" />
+	<link href="https://www.instagram.com/thiago.margarida/" rel="me" />
+  
+  <!-- Cloudflare Web Analytics -->
+  <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "0282bdd3b68748aba686aabfce19dc6c"}'></script>
+  <!-- End Cloudflare Web Analytics -->
+  </head>
+  <body>
+    <header>
+      <h1 class="home"><a href="{{ '/' | url }}">{{ metadata.title }}</a></h1>
+
+      {#- Read more about `eleventy-navigation` at https://www.11ty.dev/docs/plugins/navigation/ #}
+      <ul class="nav">
+      {%- for entry in collections.all | eleventyNavigation %}
+        <li class="nav-item{% if entry.url == page.url %} nav-item-active{% endif %}"><a href="{{ entry.url | url }}">{{ entry.title }}</a></li>
+      {%- endfor %}
+        <li class="nav-item"><a href="/feed/feed.xml">RSS</a></li>
+      </ul>
+    </header>
+
+    <main{% if templateClass %} class="{{ templateClass }}"{% endif %}>
+      {{ content | safe }}
+    </main>
+
+    {% include 'footer.njk' %}
+
+    <!-- Current page: {{ page.url | url }} -->
+  </body>
+</html>
