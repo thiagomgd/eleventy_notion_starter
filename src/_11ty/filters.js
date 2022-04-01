@@ -1,6 +1,6 @@
 const { DateTime } = require("luxon");
 const CleanCSS = require("clean-css");
-const rootUrl = require("../_data/metadata.json").url;
+const metadata = require("../_data/metadata.json");
 const MarkdownIt = require("markdown-it");
 const plainText = require("markdown-it-plain-text");
 
@@ -34,14 +34,14 @@ module.exports = {
     return new CleanCSS({}).minify(code).styles;
   },
   generateDiscussionLink: (url) => {
-    const postUrl = `${rootUrl}${url}`;
+    const postUrl = `${metadata.url}${url}`;
     return `https://twitter.com/search?f=tweets&src=typd&q=${encodeURI(
       postUrl
     )}`;
   },
   generateShareLink: (url, text) => {
     const shareText = `${text}`; // by @FalconSensei`;
-    const shareUrl = `${rootUrl}${url}`;
+    const shareUrl = `${metadata.url}${url}`;
     return `https://twitter.com/intent/tweet/?text=${encodeURI(
       shareText
     )}&url=${encodeURI(shareUrl)}`;
@@ -107,7 +107,7 @@ module.exports = {
     return webmentions.children.filter((entry) => entry["wm-target"] === url);
   },
   isOwnWebmention: (webmention) => {
-    const urls = ["https://geekosaur.com", "https://twitter.com/FalconSensei"];
+    const urls = [metadata.url, `https://twitter.com/${metadata.author.twitter_handle}`];
     const authorUrl = webmention.author ? webmention.author.url : false;
     // check if a given URL is part of this site.
     return authorUrl && urls.includes(authorUrl);

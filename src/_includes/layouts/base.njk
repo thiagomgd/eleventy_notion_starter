@@ -32,20 +32,25 @@
         url=absolutePostUrl,
         img=thumbnailUrl,
         twitter_card_type="summary_large_image",
-        twitter_handle="FalconSensei",
-        name="Falcon | Geekosaur",
+        twitter_handle=metadata.author.twitter_handle,
+        name=metadata.author.name,
         generator="eleventy",
         comments=true
     %}
 
-  <link rel="webmention" href="https://webmention.io/geekosaur.com/webmention" />
-	<link rel="pingback" href="https://webmention.io/geekosaur.com/xmlrpc" />
-	<link href="https://twitter.com/FalconSensei" rel="me" />
-	<link rel="me" href="https://mastodon.social/@falcon" />
-	<link href="https://www.instagram.com/thiago.margarida/" rel="me" />
+  <link rel="webmention" href="https://webmention.io/{{ metadata.domain }}/webmention" />
+	<link rel="pingback" href="https://webmention.io/{{ metadata.domain }}/xmlrpc" />
+  {% if metadata.author.twitter_handle %}
+  	<link href="https://twitter.com/{{ metadata.author.twitter_handle }}" rel="me" />
+  {% endif %}
+  {% if metadata.author.mastodon_url %}
+    <link rel="me" href="{{ metadata.author.mastodon_url }}" />
+  {% endif %}
   
   <!-- Cloudflare Web Analytics -->
-  <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "0282bdd3b68748aba686aabfce19dc6c"}'></script>
+  {% if metadata.cloudflare_beacon %}
+  <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "{{  metadata.cloudflare_beacon }}"}'></script>
+  {% endif %}
   <!-- End Cloudflare Web Analytics -->
   </head>
   <body>

@@ -3,6 +3,8 @@ const outdent = require("outdent")({ newline: " " });
 
 const { getLocalImageLink } = require("../_11ty/helpers");
 
+const metadata = require("../_data/metadata.json");
+
 const EMPTY = ``;
 
 const youtube = (id) => {
@@ -16,8 +18,8 @@ allowfullscreen>
 
 const reddit = (url) => {
   return `<blockquote class="reddit-card">
-<a href="${url}">r/geekosaur Lounge</a>
-from <a href="http://www.reddit.com/r/geekosaur">r/geekosaur</a></blockquote>
+<a href="${url}">r/${metadata.subreddit} Lounge</a>
+from <a href="http://www.reddit.com/r/${metadata.subreddit}">r/${metadata.subreddit}</a></blockquote>
 <script async src="//embed.redditmedia.com/widgets/platform.js" charset="UTF-8"></script>`;
 };
 
@@ -132,4 +134,3 @@ module.exports = {
   //   return `<figure${classMarkup}><img src="${localSrc}" alt="${alt}" />${captionMarkup}</figure>`;
   // }
 };
-

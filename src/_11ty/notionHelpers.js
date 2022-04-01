@@ -3,6 +3,7 @@ const { getLocalImageLink } = require("./helpers");
 const {generateDiscussionLink} = require("./filters");
 const fetch = require("node-fetch");
 const cheerio = require("cheerio");
+const metadata = require("../_data/metadata.json");
 
 const getLocalImages = async (note, property='Images', folder) => {
   const imagesNotion = note.properties[property].files;
@@ -170,14 +171,14 @@ function getNotionProps(thing, normalize=true) {
 
 function getUrl(post, type) {
   if (type === 'note') {
-    return `https://geekosaur.com/note/${post.id}/`
+    return `${metadata.url}/note/${post.id}/`
   }
 
-  return `https://geekosaur.com/post/${post.slug}/`
+  return `${metadata.url}/post/${post.slug}/`
 }
 
 async function searchReddit(url) {
-  const searchUrl = `https://www.reddit.com/r/geekosaur/search.json?q=${url}&restrict_sr=on&include_over_18=on&sort=relevance&t=all`;
+  const searchUrl = `https://www.reddit.com/r/${metadata.subreddit}/search.json?q=${url}&restrict_sr=on&include_over_18=on&sort=relevance&t=all`;
   const response = await fetch(searchUrl);
   if (!response.ok) {
     console.error("### not able to load from reddit")
@@ -205,13 +206,13 @@ async function updateReddit(notion, posts, type) {
   if (toUpdate.length === 0) return;
 
   // console.log('>>>>>>> U')
-  const response = await fetch('https://www.reddit.com/r/geekosaur.json');
+  const response = await fetch(`https://www.reddit.com/r/${metadata.subreddit}.json`);
   if (!response.ok) {
     console.error("### not able to load from reddit")
   }
   const responseJson = await response.json();
   const redditPostsArray = responseJson.data.children
-    .filter((post) => post.data.domain === 'geekosaur.com')
+    .filter((post) => post.data.domain === metadata.domain)
     .map((post) => ({[post.data.url]: `https://www.reddit.com${post.data.permalink}`}));
 
   const redditPosts = Object.assign({}, ...redditPostsArray);

@@ -1,22 +1,26 @@
 {
-  "title": "Geekosaur",
-  "url": "https://geekosaur.com",
-  "domain": "geekosaur.com",
+  "title": "XYZ",
+  "url": "https://XYZ.com",
+  "domain": "XYZ.com",
   "language": "en",
   "description": "Blog about books, TV, movies, anime and music.",
   "feed": {
     "subtitle": "Blog about books, TV, movies, anime and music.",
     "filename": "feed.xml",
     "path": "/feed/feed.xml",
-    "id": "https://geekosaur.com/"
+    "id": "https://XYZ.com/"
   },
   "jsonfeed": {
     "path": "/feed/feed.json",
-    "url": "https://geekosaur.com/feed/feed.json"
+    "url": "https://XYZ.com/feed/feed.json"
   },
   "author": {
-    "name": "Geekosaur",
-    "email": "geekosaur@falcon.moe",
-    "url": "https://geekosaur.com/about-me/"
-  }
+    "name": "Name",
+    "email": "email@email.com",
+    "url": "https://ZYX.com/about-me/",
+    "twitter_handle": "MyHandle",
+    "mastodon_url": "https://mastodon.social/@user"
+  },
+  "subreddit": "mysubreddit",
+  "cloudflare_beacon": ""
 }
