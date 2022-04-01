@@ -46,7 +46,11 @@ class NotionPost {
         lead: (data) => data.notion_post.lead ? data.notion_post.lead : '',
         thumbnail: async (data) => optimizeImage(await getLocalImageLink(data.notion_post.thumbnail)),
         created_date: (data) => {
-          return new Date(data.notion_post.date_published)
+          if (!data.notion_post.date_published) {
+            return new Date();
+          }
+          
+          return new Date(data.notion_post.date_published);
         },
         permalink: (data) => {
           // if(!showPost(data.notion_post)) {
