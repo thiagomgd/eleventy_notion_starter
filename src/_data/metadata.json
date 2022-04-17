@@ -22,5 +22,7 @@
     "mastodon_url": "https://mastodon.social/@user"
   },
   "subreddit": "mysubreddit",
-  "cloudflare_beacon": ""
+  "cloudflare_beacon": "",
+  "bridgy_twitter": false,
+  "twitter_reply_to": ["some tags"]
 }

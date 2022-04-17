@@ -6,7 +6,7 @@ templateClass: tmpl-post
 <div class="h-entry content-780 flow">
   <h1 class="p-name">{{ title }}</h1>
 
-  {%if lead %}
+  {% if lead %}
   <p class="post-lead">{{ lead }}</p>
   {% endif %}
 
@@ -19,6 +19,16 @@ templateClass: tmpl-post
 
   <div class="e-content flow">
     {{ content | safe }}
+
+     {% if metadata.bridgy_twitter %}
+    <a href="https://brid.gy/publish/twitter"></a>
+    {% if replyTo %}
+      <a class="u-in-reply-to" href="{{ replyTo }}"></a>
+    {% endif %}
+    {% if description %}
+      <p class="p-bridgy-twitter-content">{{ description }}</p>
+    {% endif %}
+  {% endif %}
   </div>
 
   <hr />

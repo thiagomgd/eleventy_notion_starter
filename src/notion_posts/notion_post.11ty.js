@@ -59,7 +59,8 @@ class NotionPost {
           const slug = data.notion_post.slug ? data.notion_post.slug : slugify(data.notion_post.title) ;
           return `/post/${slug}/`;
         },
-        tweetId: (data) => getTwitterId(data.notion_post.tweet)
+        tweetId: (data) => getTwitterId(data.notion_post.tweet),
+        replyTo: (data) => data.notion_post.reply_to
       },
       
     };

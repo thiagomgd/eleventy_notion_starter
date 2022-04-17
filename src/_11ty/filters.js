@@ -107,7 +107,10 @@ module.exports = {
     return webmentions.children.filter((entry) => entry["wm-target"] === url);
   },
   isOwnWebmention: (webmention) => {
-    const urls = [metadata.url, `https://twitter.com/${metadata.author.twitter_handle}`];
+    const urls = [
+      metadata.url,
+      `https://twitter.com/${metadata.author.twitter_handle}`,
+    ];
     const authorUrl = webmention.author ? webmention.author.url : false;
     // check if a given URL is part of this site.
     return authorUrl && urls.includes(authorUrl);
@@ -160,5 +163,8 @@ module.exports = {
   getTwitterId: (url) => {
     if (!url) return "";
     return url.substring(url.lastIndexOf("/") + 1, url.length);
+  },
+  getWithTag: (posts, tag) => {
+    return posts.filter((post) => post.data.tags.includes(tag));
   },
 };

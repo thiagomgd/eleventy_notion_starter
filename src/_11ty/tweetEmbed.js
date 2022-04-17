@@ -1,8 +1,11 @@
 const EleventyFetch = require("@11ty/eleventy-fetch");
+const { kebabCase } = require("lodash");
 
 function extractTweetInfo(str) {
-    const tweetUrl = str.indexOf('?') ? str.substring(0, str.indexOf('?')) : str;
+    const tweetUrl = str.indexOf('?') > 0 ? str.substring(0, str.indexOf('?')) : str;
     const match = tweetUrl.split('/');
+    
+    // TODO: throw error when can't find userHandle and tweetId
 	return {
 		userHandle: match[3],
 		tweetId: match[5],
@@ -12,8 +15,8 @@ function extractTweetInfo(str) {
 const twitterDefaults = {
 	align: undefined,
 	embedClass: "eleventy-plugin-embed-twitter",
-	cacheText: false,
-	cacheDuration: "5m",
+	cacheText: true,
+	cacheDuration: "5y",
 	cards: undefined,
 	conversation: undefined,
 	doNotTrack: false,
@@ -21,13 +24,12 @@ const twitterDefaults = {
 	oEmbedUrl: "https://publish.twitter.com/oembed",
 	theme: undefined,
 	width: undefined,
-	twitterScript: {
-		async: true,
-		charset: "utf-8",
-		defer: false,
-		enabled: true,
-		src: "https://platform.twitter.com/widgets.js",
-	},
+  twitterScriptAsync: true,
+  twitterScriptCharset: "utf-8",
+  twitterScriptDefer: false,
+  twitterScriptEnabled: true,
+  twitterScriptSrc: "https://platform.twitter.com/widgets.js",
+	
 };
 
 /**
@@ -139,7 +141,7 @@ function buildOptions(obj, format = "html") {
  */
 function defaultTweet(tweet, options, index) {
   let embedAttrs = buildOptions(options);
-  const isScriptEnabled = index === 0;// && options.twitterScript.enabled;
+  const isScriptEnabled = index === 0 && options.twitterScriptEnabled;
 
   let out = `<div class="${options.embedClass}">`;
   out += `<blockquote id="tweet-${tweet.tweetId}" class="twitter-tweet"${
@@ -149,10 +151,10 @@ function defaultTweet(tweet, options, index) {
   out += "</blockquote>";
   out += "</div>";
 
-  let twitterScript = `<script src="${options.twitterScript.src}"`;
-  twitterScript += ` charset="${options.twitterScript.charset}"`;
-  twitterScript += options.twitterScript.async ? " async" : "";
-  twitterScript += options.twitterScript.defer ? " defer" : "";
+  let twitterScript = `<script src="${options.twitterScriptSrc}"`;
+  twitterScript += ` charset="${options.twitterScriptCharset}"`;
+  twitterScript += options.twitterScriptAsync ? " async" : "";
+  twitterScript += options.twitterScriptDefer ? " defer" : "";
   twitterScript += ">";
   twitterScript += "</script>";
 
@@ -171,12 +173,12 @@ function defaultTweet(tweet, options, index) {
 async function cachedTweet(tweet, options, index) {
   const oEmbedUrl = new URL(options.oEmbedUrl);
   const tweetUrl = `https://twitter.com/${tweet.userHandle}/status/${tweet.tweetId}`;
-  const isScriptEnabled = index === 0 && options.twitterScript.enabled;
+  const isScriptEnabled = index === 0 && options.twitterScriptEnabled;
 
   let optionsAmendedForOembed = {
       ...options, 
       tweetUrl: tweetUrl,
-    omit_script: !isScriptEnabled,
+      omit_script: !isScriptEnabled,
   };
 
   let oEmbedParamString = buildOptions(optionsAmendedForOembed, "url");
@@ -184,10 +186,11 @@ async function cachedTweet(tweet, options, index) {
   let oEmbedRequestUrl = oEmbedUrl + oEmbedParamString;
 
   try {
-    const json = await Cache(oEmbedRequestUrl, {
+    const json = await EleventyFetch(oEmbedRequestUrl, {
       duration: options.cacheDuration,
       type: "json",
     });
+
     let out = `<div class="${options.embedClass}">`;
     out += json.html;
     out += "</div>";

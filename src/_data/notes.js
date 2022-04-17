@@ -105,9 +105,10 @@ module.exports = async function () {
   console.log(">>> Checking for new notes...");
   const newNotes = await fetchNotes();
 
-  // updateTweet(newNotes, 'note');
-  updateReddit(notion, newNotes, 'note');
-  return processAndReturn(newNotes);
+  await updateReddit(notion, newNotes, 'note');
+  await updateTweet(notion, newNotes, 'note');
+  const publishedNotes = processAndReturn(newNotes);
+  return publishedNotes;
 };
 
 // module.exports = async function () {

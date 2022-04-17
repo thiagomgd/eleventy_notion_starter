@@ -25,6 +25,16 @@ templateClass: tmpl-post
 
   <div class="e-content flow">
     {{ content | safe }}
+
+    {% if metadata.bridgy_twitter %}
+    <a href="https://brid.gy/publish/twitter"></a>
+    {% if replyTo %}
+      <a class="u-in-reply-to" href="{{ replyTo }}"></a>
+    {% endif %}
+    {% if description %}
+      <p class="p-bridgy-twitter-content">{{ description }}</p>
+    {% endif %}
+  {% endif %}
   </div>
 
   <hr />
@@ -72,4 +82,5 @@ templateClass: tmpl-post
       </ul>
     {%- endif %}
   {%- endif %}
+
 </div>

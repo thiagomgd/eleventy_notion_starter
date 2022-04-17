@@ -943,3 +943,8 @@ figure.vertical, img.vertical {
 .unfurl + .unfurl {
   margin-block-start: 2rem;
 }
+
+/* DONT SHOW TWITTER TEXT */
+p.p-bridgy-twitter-content, .hidden {
+  display: none;
+}

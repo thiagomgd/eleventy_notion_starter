@@ -16,7 +16,8 @@ eleventyComputed:
   created_time: "{{ note.created_time }}"
   id: "{{ note.id }}"
   tweetId: "{{ note.tweet | getTwitterId }}"
-permalink: "note/{{ note.id }}/"
+  replyTo: "{{ note.reply_to }}"
+  permalink: "note/{{ note.id }}/"
 ---
 
 {% anyEmbed note.embed %}
@@ -25,6 +26,6 @@ permalink: "note/{{ note.id }}/"
 
 {% for image in note.images %}
 
-{% figure image %}
+{% figure image, "", "u-photo" %}
 
 {% endfor %}
