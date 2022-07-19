@@ -1,0 +1,30 @@
+---
+layout: layouts/home.njk
+permalink: /links/
+eleventyNavigation:
+  key: Links
+  order: 10
+---
+
+<section class="content-780">
+  <h1>Links</h1>
+
+  {# <ol reversed class="postlist" style="counter-reset: start-from {{ (links.length) + 1 }}"> #}
+    <ol reversed>
+{% for link in links | reverse %}
+  {# <li class="postlist-item{% if link.url == url %} postlist-item-active{% endif %}"> #}
+    <li>
+    <a href="{{ link.link | url }}" class="postlist-link">{% if link.title %}{{ link.title }}{% else %}<code>{{ link.link }}</code>{% endif %}</a>
+    {# <time class="postlist-date" datetime="{{ link.created | htmlDateString }}">{{ link.created | readableDate }}</time> #}
+    {# {% for tag in link.tags | filterTagList %}
+      {% set tagUrl %}/tags/{{ tag | slugify }}/{% endset %}
+      <a href="{{ tagUrl | url }}" class="post-tag">{{ tag }}</a>
+    {% endfor %} #}
+    {% if link.comments | length %}
+      <p>{{ link.comments }}</p>
+    {% endif %}
+  </li>
+{% endfor %}
+</ol>
+
+</section>

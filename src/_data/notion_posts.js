@@ -7,6 +7,18 @@ const {
   getLocalImageLink,
 } = require("../_11ty/helpers");
 const { fetchFromNotion, getNotionProps, getLocalImages, updateReddit, updateTweet } = require("../_11ty/notionHelpers");
+const { DateTime } = require('luxon');
+
+// TODO: move to Date utils, get timezone from config
+const isoToDateTime = (date, lang = 'en') =>
+  DateTime.fromISO(date, { setZone: true })
+    .setZone('America/Vancouver')
+    .setLocale(lang);
+
+const jsToDateTime = (date, lang = 'en') =>
+  DateTime.fromJSDate(date, { setZone: true })
+    .setZone('America/Vancouver')
+    .setLocale(lang);
 
 const { Client } = require("@notionhq/client");
 // https://github.com/souvikinator/notion-to-md
@@ -87,7 +99,7 @@ function mergePosts(a = {}, b = {}) {
 }
 
 
-const todaysDate = new Date();
+const todaysDate = jsToDateTime(new Date());
 function showPost(data) {
   // FOR NOW: also filter posts without slug - don't want to have it change over time
   const hasSlug = "slug" in data && data.slug !== '';

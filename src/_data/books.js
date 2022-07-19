@@ -44,7 +44,7 @@ const notion = new Client({ auth: TOKEN });
 // }
 
 // TODO: filter by updated since last sync
-async function fetchBooks() {
+async function fetchBooks(since) {
   // If we dont have a domain name or token, abort
   if (!DATABASE_ID || !TOKEN) {
     console.warn(">>> unable to fetch notes: missing token or db id");
@@ -53,6 +53,7 @@ async function fetchBooks() {
 
   const p = {
     and: [
+      { property: "Edited", date: { after: since } },
       {
         property: "Status",
         select: {
@@ -81,54 +82,81 @@ async function fetchBooks() {
   const results = await fetchFromNotion(notion, DATABASE_ID, p);
 
   if (results) {
-    const newBooks = [];
+    const newBooks = {};
     console.log(`>>> ${results.length} new books fetched`);
 
     for (const book of results) {
       const newBook = getNotionProps(book, false);
 
-      newBooks.push({
+      newBooks[book.id] = {
         title: newBook["Title"],
         cover: newBook["Cover"],
         rating: newBook["My Rating"],
         review: newBook["Review"],
         date_read: newBook["Date Read"],
-        year_read: newBook["Date Read"] ? newBook["Date Read"].getFullYear() : 0,
-      });
-    }
-
-    return groupBy(newBooks, "year_read");
-  }
-
-  return null;
-}
-
-module.exports = async function () {
-  // return [];
-  console.log(">>> Reading books from cache...");
-  const cache = readFromCache(CACHE_FILE_PATH);
-
-  if (cache.length) {
-    console.log(`>>> Books loaded from cache`);
-  }
-
-  // Only fetch new mentions in production
-  if (process.env.ELEVENTY_ENV === "development") return cache;
-  // if (process.env.ELEVENTY_ENV !== "devbuild") return cache;
-
-  console.log(">>> Checking for new books...");
-  const newBooks = await fetchBooks();
-  // console.log(newBooks);
-  // TODO: after getting only new items, merge cache and new
-
-  if (newBooks) {
-    if (process.env.ELEVENTY_ENV === "devbuild") {
-      writeToCache(newBooks, CACHE_FILE_PATH, "books");
+        year_read: newBook["Date Read"] ? newBook["Date Read"].year : 0,
+      };
     }
 
     return newBooks;
   }
 
-  return cache;
-  // return [];
+  return null;
+}
+
+function sortBooks(books) {
+  const sorted = {}
+  const groupedBooks = groupBy(books, "year_read")
+
+  for (year in groupedBooks) {
+    const yearBooks = groupedBooks[year];
+    yearBooks.sort((a, b)=>{
+    // books[year].sort((a, b)=>{
+      if (a.rating !== b.rating) {
+        return b.rating - a.rating;
+      }
+
+      if (a.date_read && b.date_read) {
+        return a - b;
+      }
+
+      return 0; // todo
+    })
+    sorted[year] = yearBooks;
+  }
+
+  return sorted;
+}
+
+module.exports = async function () {
+  console.log(">>> Reading books from cache...");
+  const cache = readFromCache(CACHE_FILE_PATH);
+
+  if (Object.keys(cache.data).length) {
+    console.log(`>>> Books loaded from cache`);
+  }
+
+  // Only fetch new mentions in production
+  if (process.env.ELEVENTY_ENV === "development") return sortBooks(cache.data);
+  // if (process.env.ELEVENTY_ENV !== "devbuild") return cache;
+
+  console.log(">>> Checking for new books...");
+  const newBooks = await fetchBooks(cache.lastFetched);
+
+  if (!newBooks) {
+    return sortBooks(cache.data);
+  }
+
+  const newData = {...cache.data, ...newBooks}
+
+  const newCache = {
+    lastFetched: new Date().toISOString(),
+    data: newData,
+  };
+
+  if (process.env.ELEVENTY_ENV === "devbuild") {
+    writeToCache(newCache, CACHE_FILE_PATH, "books");
+  }
+
+  return sortBooks(newData);
 };

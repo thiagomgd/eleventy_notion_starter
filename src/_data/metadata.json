@@ -24,5 +24,6 @@
   "subreddit": "mysubreddit",
   "cloudflare_beacon": "",
   "bridgy_twitter": false,
-  "twitter_reply_to": ["some tags"]
+  "twitter_reply_to": ["some tags"],
+  "notion_links": "a7f8fc3c486a487fb51e099457485108"
 }

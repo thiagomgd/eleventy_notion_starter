@@ -167,4 +167,9 @@ module.exports = {
   getWithTag: (posts, tag) => {
     return posts.filter((post) => post.data.tags.includes(tag));
   },
+  getTotalForDict: (dict) => {
+    return total = Object.keys(dict).reduce((total, key) => {
+      return total + dict[key].length;
+    }, 0)
+  },
 };

@@ -10,7 +10,7 @@ const { NotionToMarkdown } = require("notion-to-md");
 
 // Define Cache Location and API Endpoint
 const CACHE_FILE_PATH = "src/_cache/notes.json";
-const DATABASE_ID = "";
+const DATABASE_ID = "66ebf4c34b694d0a94763b3936d9cd9b";
 const TOKEN = process.env.NOTION_API_KEY
 
 const notion = new Client({ auth: TOKEN });
