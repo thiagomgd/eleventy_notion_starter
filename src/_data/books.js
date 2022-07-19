@@ -1,6 +1,4 @@
 const groupBy = require("lodash/groupBy");
-const fs = require("fs");
-const domain = require("./metadata.json").domain;
 const {readFromCache, writeToCache} = require("../_11ty/helpers");
 const {fetchFromNotion, getNotionProps} = require("../_11ty/notionHelpers");
 
@@ -117,7 +115,7 @@ function sortBooks(books) {
       }
 
       if (a.date_read && b.date_read) {
-        return a - b;
+        return new Date(b.date_read) - new Date(a.date_read);
       }
 
       return 0; // todo
