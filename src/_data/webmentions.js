@@ -1,28 +1,28 @@
 const fetch = require("node-fetch");
 const unionBy = require("lodash/unionBy");
 const domain = require("./metadata.json").domain;
-const { readFromCache, writeToCache } = require("../_11ty/helpers");
+const {readFromCache, writeToCache} = require("../_11ty/helpers");
+const metadata = require("./metadata.json");
 
 // Define Cache Location and API Endpoint
 const CACHE_FILE_PATH = "src/_cache/webmentions.json";
 const API = "https://webmention.io/api";
-const TOKEN = ""; //process.env.WEBMENTION_IO_TOKEN
 
 async function fetchWebmentions(since, perPage = 10000) {
   // If we dont have a domain name or token, abort
-  if (!domain || !TOKEN) {
+  if (!domain || !metadata["webmention_token"]) {
     console.warn(">>> unable to fetch webmentions: missing domain or token");
     return false;
   }
 
-  let url = `${API}/mentions.jf2?domain=${domain}&token=${TOKEN}&per-page=${perPage}`;
+  let url = `${API}/mentions.jf2?domain=${domain}&token=${metadata["webmention_token"]}&per-page=${perPage}`;
   if (since) url += `&since=${since}`; // only fetch new mentions
 
   const response = await fetch(url);
   if (response.ok) {
     const feed = await response.json();
     console.log(
-      `>>> ${feed.children.length} new webmentions fetched from ${API}`
+        `>>> ${feed.children.length} new webmentions fetched from ${API}`
     );
     return feed;
   }
@@ -57,7 +57,7 @@ module.exports = async function () {
     if (process.env.ELEVENTY_ENV === "devbuild") {
       writeToCache(webmentions, CACHE_FILE_PATH, "webmentions");
     }
-    
+
     return webmentions;
   }
 

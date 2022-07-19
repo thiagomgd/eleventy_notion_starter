@@ -25,5 +25,8 @@
   "cloudflare_beacon": "",
   "bridgy_twitter": false,
   "twitter_reply_to": ["some tags"],
-  "notion_links": "a7f8fc3c486a487fb51e099457485108"
+  "notion_links": "",
+  "notion_books": "",
+  "notion_notes": "",
+  "notion_posts": ""
 }

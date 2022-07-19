@@ -1,16 +1,11 @@
-const fetch = require("node-fetch");
-const fs = require("fs");
-const domain = require("./metadata.json").domain;
-// const { readFromCache, writeToCache, getLocalImageLink } = require("../_11ty/helpers");
-const { fetchFromNotion, getNotionProps, getLocalImages, updateTweet, updateReddit } = require("../_11ty/notionHelpers");
+const { fetchFromNotion, getNotionProps, updateTweet, updateReddit } = require("../_11ty/notionHelpers");
 
 const { Client } = require('@notionhq/client');
 // https://github.com/souvikinator/notion-to-md
-const { NotionToMarkdown } = require("notion-to-md");
+const { NotionToMarkdown } = require("notion-to-md"); const metadata = require("./metadata.json");
 
 // Define Cache Location and API Endpoint
 const CACHE_FILE_PATH = "src/_cache/notes.json";
-const DATABASE_ID = "66ebf4c34b694d0a94763b3936d9cd9b";
 const TOKEN = process.env.NOTION_API_KEY
 
 const notion = new Client({ auth: TOKEN });
@@ -24,14 +19,6 @@ const getMetadata = (note) => {
     "cover": note.cover,
     "icon": note.icon,
   }
-}
-
-const getEmbed = (note) => {
-  return note.properties.Embed.url;
-}
-
-const getFormat = (note) => {
-  return note.properties.Format.select ? note.properties.Format.select.name : 'text';
 }
 
 async function fetchPage(pageId) {
@@ -48,19 +35,12 @@ async function fetchPage(pageId) {
 }
 
 async function fetchNotes(since) {
-  if (!DATABASE_ID || !TOKEN) {
+  if (!metadata["notion_notes"] || !TOKEN) {
     console.warn(">>> unable to fetch notes: missing token or db id");
     return null;
   }
 
-  // const filters = since
-  //   ? {
-  //       property: "Edited",
-  //       date: { after: since },
-  //     }
-  //   : {};
-
-  const results = await fetchFromNotion(notion, DATABASE_ID, undefined);
+  const results = await fetchFromNotion(notion, metadata["notion_notes"], undefined);
 
   if (results) {
     console.log(
@@ -87,11 +67,6 @@ async function fetchNotes(since) {
   return null;
 }
 
-// Append fresh notes to cached entries
-function mergeNotes(a={}, b={}) {
-  return { ...a, ...b };
-}
-
 function processAndReturn(notes) {
   return Object.values(notes)
     .sort(function(a, b) {
@@ -110,33 +85,3 @@ module.exports = async function () {
   const publishedNotes = processAndReturn(newNotes);
   return publishedNotes;
 };
-
-// module.exports = async function () {
-//   console.log(">>> Reading notes from cache...");
-//   const cache = readFromCache(CACHE_FILE_PATH);
-
-//   if (cache.notes && Object.keys(cache.notes).length) {
-//     console.log(`>>> ${Object.keys(cache.notes).length} notes loaded from cache`);
-//   }
-
-//   // Only fetch new notes in production
-//   // if (process.env.ELEVENTY_ENV === "development") return processAndReturn(cache.notes);
-
-//   console.log(">>> Checking for new notes...");
-//   const newNotes = await fetchNotes(cache.lastFetched);
-
-//   if (newNotes) {
-//     const notes = {
-//       lastFetched: new Date().toISOString(),
-//       notes: mergeNotes(cache.notes, newNotes),
-//     };
-
-//     if (process.env.ELEVENTY_ENV === "devbuild") {
-//       writeToCache(notes, CACHE_FILE_PATH, "notes");
-//     }
-    
-//     return processAndReturn(notes.notes);
-//   }
-
-//   return processAndReturn(cache.notes);
-// };

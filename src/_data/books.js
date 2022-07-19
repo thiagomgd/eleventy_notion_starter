@@ -1,20 +1,20 @@
 const groupBy = require("lodash/groupBy");
 const fs = require("fs");
 const domain = require("./metadata.json").domain;
-const { readFromCache, writeToCache } = require("../_11ty/helpers");
-const { fetchFromNotion, getNotionProps } = require("../_11ty/notionHelpers");
+const {readFromCache, writeToCache} = require("../_11ty/helpers");
+const {fetchFromNotion, getNotionProps} = require("../_11ty/notionHelpers");
 
-const { Client } = require("@notionhq/client");
+const {Client} = require("@notionhq/client");
+const metadata = require("./metadata.json");
 // // https://github.com/souvikinator/notion-to-md
 // const { NotionToMarkdown } = require("notion-to-md");
 
 // // Define Cache Location and API Endpoint
 const CACHE_FILE_PATH = "src/_cache/books.json";
-const DATABASE_ID = "";
 const TOKEN = process.env.NOTION_API_KEY;
 // const imageFolder = "/img/books/"
 
-const notion = new Client({ auth: TOKEN });
+const notion = new Client({auth: TOKEN});
 
 // const getImages = (note) => {
 //   const imagesNotion = note.properties.Images.files;
@@ -46,14 +46,14 @@ const notion = new Client({ auth: TOKEN });
 // TODO: filter by updated since last sync
 async function fetchBooks(since) {
   // If we dont have a domain name or token, abort
-  if (!DATABASE_ID || !TOKEN) {
+  if (!metadata["notion_books"] || !TOKEN) {
     console.warn(">>> unable to fetch notes: missing token or db id");
     return null;
   }
 
   const p = {
     and: [
-      { property: "Edited", date: { after: since } },
+      {property: "Edited", date: {after: since}},
       {
         property: "Status",
         select: {
@@ -79,7 +79,7 @@ async function fetchBooks(since) {
     ],
   };
 
-  const results = await fetchFromNotion(notion, DATABASE_ID, p);
+  const results = await fetchFromNotion(notion, metadata["notion_books"], p);
 
   if (results) {
     const newBooks = {};
@@ -110,8 +110,8 @@ function sortBooks(books) {
 
   for (year in groupedBooks) {
     const yearBooks = groupedBooks[year];
-    yearBooks.sort((a, b)=>{
-    // books[year].sort((a, b)=>{
+    yearBooks.sort((a, b) => {
+      // books[year].sort((a, b)=>{
       if (a.rating !== b.rating) {
         return b.rating - a.rating;
       }
@@ -129,6 +129,7 @@ function sortBooks(books) {
 }
 
 module.exports = async function () {
+  // return [];
   console.log(">>> Reading books from cache...");
   const cache = readFromCache(CACHE_FILE_PATH);
 
@@ -138,7 +139,6 @@ module.exports = async function () {
 
   // Only fetch new mentions in production
   if (process.env.ELEVENTY_ENV === "development") return sortBooks(cache.data);
-  // if (process.env.ELEVENTY_ENV !== "devbuild") return cache;
 
   console.log(">>> Checking for new books...");
   const newBooks = await fetchBooks(cache.lastFetched);

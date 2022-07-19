@@ -3,7 +3,6 @@ const pluginRss = require("@11ty/eleventy-plugin-rss");
 // const pluginSyntaxHighlight = require("@11ty/eleventy-plugin-syntaxhighlight");
 const pluginNavigation = require("@11ty/eleventy-navigation");
 const pluginTOC = require('eleventy-plugin-toc')
-const metagen = require('eleventy-plugin-metagen');
 const markdownIt = require("markdown-it");
 const markdownItAnchor = require("markdown-it-anchor");
 const markdownItFootnote = require("markdown-it-footnote");
@@ -12,7 +11,7 @@ const helpers = require('./src/_11ty/helpers');
 const shortcodes = require('./src/_11ty/shortcodes');
 const pairedShortcodes = require('./src/_11ty/pairedShortcodes');
 const asyncShortcodes = require('./src/_11ty/asyncShortcodes');
-const {anyEmbed, figure, blur} = require('./src/_11ty/asyncShortcodes');
+const {anyEmbed, figure, blur, tweet} = require('./src/_11ty/asyncShortcodes');
 const cheerio = require("cheerio");
 
 function hasBodyTag(content) {
@@ -23,8 +22,8 @@ function hasBodyTag(content) {
 async function replaceSpecialLinks(content, options) {
   const $ = cheerio.load(content);
   // TODO: only block links
+  const replace = ['bookmark', 'embed','textTweet'];
   let links = $("a").filter((i, el) => {
-    const replace = ['bookmark', 'embed'];
     const text = $(el).text();
     return replace.includes(text);
   });
@@ -33,9 +32,13 @@ async function replaceSpecialLinks(content, options) {
   for (let i = 0; i < links.length; i++) {
     const link = links[i];
     const url = $(link).attr('href');
-    // console.log(`Optimizing: ${url}`);
+    const text = $(link).text();
 
-    promises[i] = anyEmbed(url);
+    if (text === 'textTweet') {
+      promises[i] = tweet(url, {twitterScriptEnabled: false});  
+    } else {
+      promises[i] = anyEmbed(url);
+    }
   }
 
   const embeds = await Promise.all(promises);
@@ -50,6 +53,7 @@ async function replaceSpecialLinks(content, options) {
 async function imgToFigure(content, options) {
   const $ = cheerio.load(content);
   // TODO: only block links
+  // TODO: images from notion are surrounded by empty paragraphs. Eliminate them
   let images = $("p img")
     .not("picture img"); // Ignore images wrapped in <picture>
     // .not("[data-img2picture-ignore]") // Ignore excluded images
@@ -87,7 +91,6 @@ module.exports = function(eleventyConfig) {
     ul: true,
     wrapper: 'nav'
   })
-  eleventyConfig.addPlugin(metagen);
 
   // Add filters
   Object.keys(filters).forEach(filterName => {
@@ -125,16 +128,6 @@ module.exports = function(eleventyConfig) {
 
   // Alias `layout: post` to `layout: layouts/post.njk`
   eleventyConfig.addLayoutAlias("post", "layouts/post.njk");
-
-  // Create an array of all tags
-  eleventyConfig.addCollection("tagList", function(collection) {
-    let tagSet = new Set();
-    collection.getAll().forEach(item => {
-      (item.data.tags || []).forEach(tag => tagSet.add(tag));
-    });
-
-    return filterTagList([...tagSet]);
-  });
 
   // https://11ta.netlify.app/2020/09/20/v110-brings-draft-posts/
   /**
@@ -184,6 +177,16 @@ module.exports = function(eleventyConfig) {
 
       return timeA - timeB;
     });
+  });
+
+  // Create an array of all tags
+  eleventyConfig.addCollection("tagList", function(collection) {
+    let tagSet = new Set();
+    collection.getAll().forEach(item => {
+      (item.data.tags || []).forEach(tag => tagSet.add(tag));
+    });
+
+    return filterTagList([...tagSet]);
   });
 
   // https://shivjm.blog/colophon/how-i-create-an-article-series-in-eleventy/
