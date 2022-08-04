@@ -120,7 +120,7 @@ module.exports = async function () {
     console.log(">>> Reading posts from cache...");
     const cache = readFromCache(CACHE_FILE_PATH);
 
-    if (Object.keys(cache.data).length) {
+    if (cache.data && Object.keys(cache.data).length) {
         console.log(`>>> ${Object.keys(cache.data).length} posts loaded from cache`);
     }
 
