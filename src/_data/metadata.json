@@ -24,9 +24,10 @@
   "subreddit": "mysubreddit",
   "cloudflare_beacon": "",
   "bridgy_twitter": false,
-  "twitter_reply_to": ["some tags"],
+  "twitter_reply_to": [],
   "notion_links": "",
   "notion_books": "",
   "notion_notes": "",
-  "notion_posts": ""
+  "notion_posts": "",
+  "webmention_token": ""
 }

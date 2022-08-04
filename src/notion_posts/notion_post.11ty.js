@@ -44,7 +44,7 @@ class NotionPost {
         title: (data) => data.notion_post.title,
         description: (data) => data.notion_post.description ? data.notion_post.description : '',
         lead: (data) => data.notion_post.lead ? data.notion_post.lead : '',
-        thumbnail: async (data) => optimizeImage(await getLocalImageLink(data.notion_post.thumbnail)),
+        thumbnail: async (data) => await getLocalImageLink(data.notion_post.thumbnail), // skipped unless embed, but I don't really do that
         created_date: (data) => {
           if (!data.notion_post.date_published) {
             return new Date();

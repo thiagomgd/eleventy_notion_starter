@@ -5,6 +5,7 @@ const MarkdownIt = require("markdown-it");
 const plainText = require("markdown-it-plain-text");
 
 const { getLocalImageLink } = require("../_11ty/helpers");
+const {sortBy} = require("lodash/collection");
 
 const md = new MarkdownIt();
 
@@ -172,4 +173,12 @@ module.exports = {
       return total + dict[key].length;
     }, 0)
   },
+  sortAndFilterManga: (mangaList) => {
+    const sorted = sortBy(mangaList, 'volume');
+    if (sorted.length <= 4) return sorted;
+
+    return [sorted[0], {title:"..."}, sorted[sorted.length - 2], sorted[sorted.length - 1]];
+
+
+  }
 };
