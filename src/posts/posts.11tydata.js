@@ -1,5 +1,5 @@
 // const { process } = require("clean-css");
-const { getLocalImageLink, optimizeImage } = require("../_11ty/helpers");
+const { getLocalImageLink, getOptimizedUrl } = require("../_11ty/helpers");
 
 const isDevEnv = process.env.ELEVENTY_ENV === 'development';
 const todaysDate = new Date();
@@ -31,17 +31,17 @@ module.exports = function() {
 			},
 			thumbnail: async function(data) {
 				const src = await getLocalImageLink(data.thumbnail);
-				return await optimizeImage(src);
+				return await getOptimizedUrl(src);
 			},
 			created_date: function(data) {
 				return data.page.date;
 			}
 		},
 
-        layout: "layouts/post.njk",
-        tags: [
-          "post"
-        ],
-        permalink: "post/{% if slug %}{{ slug }}{% else %}{{ page.fileSlug }}{% endif %}/"		
+		layout: "layouts/post.njk",
+		tags: [
+			"post"
+		],
+		permalink: "post/{% if slug %}{{ slug }}{% else %}{{ page.fileSlug }}{% endif %}/"
 	}
 }

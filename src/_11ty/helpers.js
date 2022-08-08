@@ -159,7 +159,7 @@ async function downloadNotionImage(notionId, imgUrl) {
 
     // since the original images are on Notion, no need to keep original here
     const res = await getOptimizedUrl(imgUrl, dir, "outputPath");
-
+    // console.log("RES", res);
     return res.replace('src', '');
 }
 
@@ -186,16 +186,16 @@ async function optimizeImage(src, outputDir = "_site/img",) {
 
     const extraProps = src.includes(".gif")
         ? {
-            formats: ["webp", "gif"],
+            formats: ["gif"],//["webp", "gif"],
             sharpOptions: {
                 animated: true,
             },
         }
-        : {};
+        : {formats: ["jpeg"]};
 
     let metadata = await Image(fileSource, {
         widths: [1200],
-        outputDir: "_site/img",
+        outputDir: outputDir,
         cacheOptions: {
             duration: "8w",
         },
@@ -206,6 +206,7 @@ async function optimizeImage(src, outputDir = "_site/img",) {
 }
 
 async function getOptimizedUrl(src, outputDir = "_site/img", toReturn = "url") {
+    // console.log("!!!!!!getOptimizedUrl", src, outputDir, toReturn);
     const data = await optimizeImage(src, outputDir);
     return data[toReturn];
 }
